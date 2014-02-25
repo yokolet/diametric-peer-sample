@@ -402,7 +402,7 @@ end
       end
     end
 
-    describe "with new data", focus: true do
+    describe "with new data" do
       it "demonstrates sample 24" do
         puts "\nMake a new partition..."
         partition_tx = [{:"db/id" => Peer.tempid(:"db.part/db"),
