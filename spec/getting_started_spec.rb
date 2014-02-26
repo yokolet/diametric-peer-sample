@@ -168,7 +168,9 @@ describe "Seattle Sample", :jruby => true do
         puts "\nFind all communities that are twitter feeds and facebook pages using " +
           "the same query and passing in type as a parameter..."
         query_by_type =
-          [:find, ~"?n", :in, ~"\$", ~"?t", :where,
+          [:find, ~"?n",
+           :in, ~"\$", ~"?t",
+           :where,
           [~"?c", :"community/name", ~"?n"],
           [~"?c", :"community/type", ~"?t"]]
         results = Peer.q(query_by_type,
@@ -207,10 +209,12 @@ describe "Seattle Sample", :jruby => true do
       it "demonstrates sample 13" do
         puts "\nFind all communities that are non-commercial email-lists or commercial " +
           "web-sites using a list of tuple parameters..."
-        results = Peer.q("[:find ?n ?t ?ot :in $ [[?t ?ot]] :where " +
-                         "[?c :community/name ?n]" +
-                         "[?c :community/type ?t]" +
-                         "[?c :community/orgtype ?ot]]",
+        results = Peer.q([:find, ~"?n", ~"?t", ~"?ot",
+                          :in, ~"\$", [[~"?t", ~"?ot"]],
+                          :where,
+                          [~"?c", :"community/name", ~"?n"],
+                          [~"?c", :"community/type", ~"?t"],
+                          [~"?c", :"community/orgtype", ~"?ot"]],
                          @conn.db,
                          [[":community.type/email-list",
                            ":community.orgtype/community"],
@@ -224,10 +228,11 @@ describe "Seattle Sample", :jruby => true do
 
       it "demonstrates sample 14" do
         puts '\nFind all community names coming before "C" in alphabetical order...'
-        results = Peer.q('[:find ?n :where ' +
-                         '[?c :community/name ?n]' +
-                         '[(.compareTo ?n "C") ?res]' +
-                         '[(< ?res 0)]]',
+        results = Peer.q([:find, ~"?n",
+                          :where,
+                         [~"?c", :"community/name", ~"?n"],
+                         [:'(.compareTo ?n "C")', ~"?res"],
+                         [:"(< ?res 0)"]],
                          @conn.db)
         results.each do |result|
           puts result
@@ -237,8 +242,9 @@ describe "Seattle Sample", :jruby => true do
 
       it "demonstrates sample 15" do
         puts '\nFind all communities whose names include the string "Wallingford"...'
-        results = Peer.q('[:find ?n :where ' +
-                         '[(fulltext $ :community/name "Wallingford") [[?e ?n]]]]',
+        results = Peer.q([:find, ~"?n",
+                          :where,
+                         [:'(fulltext $ :community/name "Wallingford")', [[~"?e", ~"?n"]]]],
                          @conn.db)
         results.each do |result|
           puts result
@@ -249,12 +255,14 @@ describe "Seattle Sample", :jruby => true do
       it "demonstrates sample 16" do
         puts "\nFind all communities that are websites and that are about " +
           "food, passing in type and search string as parameters..."
-        results = Peer.q("[:find ?name ?cat :in $ ?type ?search :where " +
-                         "[?c :community/name ?name]" +
-                         "[?c :community/type ?type]" +
-                         "[(fulltext $ :community/category ?search) [[?c ?cat]]]]",
+        results = Peer.q([:find, ~"?name", ~"?cat",
+                          :in, ~"\$", ~"?type", ~"?search",
+                          :where,
+                          [~"?c", :"community/name", ~"?name"],
+                          [~"?c", :"community/type", ~"?type"],
+                          [:"(fulltext $ :community/category ?search)", [[~"?c", ~"?cat"]]]],
                          @conn.db,
-                         ":community.type/website",
+                         :"community.type/website",
                          "food")
         results.each do |result|
           puts result
@@ -295,9 +303,11 @@ describe "Seattle Sample", :jruby => true do
         end
         binding.pry
 
-        results = Peer.q("[:find ?n :in $ % :where " +
-                         "[?c :community/name ?n]" +
-                         "(region ?c :region/sw)]",
+        results = Peer.q([:find, ~"?n",
+                          :in, ~"\$", ~"%",
+                          :where,
+                          [~"?c", :"community/name", ~"?n"],
+                          :"(region ? :region/sw)"],
                          @conn.db,
                          rules)
         results.each do |result|
@@ -325,10 +335,12 @@ describe "Seattle Sample", :jruby => true do
           " [[southern ?c] (region ?c :region/sw)]" +
           " [[southern ?c] (region ?c :region/s)]" +
           " [[southern ?c] (region ?c :region/se)]]"
-        results = Peer.q("[:find ?n :in $ % :where " +
-                         "[?c :community/name ?n]" +
-                         "(southern ?c)" +
-                         "(social-media ?c)]",
+        results = Peer.q([:find, ~"?n",
+                          :in, ~"\$",  ~"%",
+                          :where,
+                          [~"?c", :"community/name", ~"?n"],
+                          :"(southern ?c)",
+                          :"(social-media ?c)"],
                          @conn.db,
                          rules)
         results.each do |result|
@@ -341,7 +353,7 @@ describe "Seattle Sample", :jruby => true do
     describe "with transaction data" do
       before :all do
         puts "\nFind all database transactions..."
-        results = Peer.q("[:find ?when :where [?tx :db/txInstant ?when]]",
+        results = Peer.q([:find, ~"?when", :where, [~"?tx", :"db/txInstant", ~"?when"]],
                          @conn.db)
         binding.pry
 
@@ -356,6 +368,7 @@ describe "Seattle Sample", :jruby => true do
         tx_dates.sort! {|x, y| y <=> x }
         @data_tx_date = tx_dates[0]
         @schema_tx_date = tx_dates[1]
+        @communities_query = [:find, ~"?c", :where, [~"?c", :"community/name"]]
         binding.pry
       end
 
@@ -365,7 +378,7 @@ describe "Seattle Sample", :jruby => true do
 
         puts "\nFind all communities as of schema transaction..."
         db_asOf_schema = @conn.db.as_of(@schema_tx_date)
-        results = Peer.q("[:find ?c :where [?c :community/name]]", db_asOf_schema)
+        results = Peer.q(@community_query, db_asOf_schema)
         puts results.size
         binding.pry
       end
@@ -373,7 +386,7 @@ describe "Seattle Sample", :jruby => true do
       it "demonstrates sample 21" do
         puts "\nFind all communities as of seed data transaction..."
         db_asOf_data = @conn.db.as_of(@data_tx_date)
-        results = Peer.q("[:find ?c :where [?c :community/name]]", db_asOf_data)
+        results = Peer.q(@community_query, db_asOf_data)
         puts results.size
         binding.pry
       end
@@ -381,7 +394,7 @@ describe "Seattle Sample", :jruby => true do
       it "demonstrates sample 22" do
         puts "\nFind all communities since schema transaction..."
         db_since_schema = @conn.db.since(@schema_tx_date)
-        results = Peer.q("[:find ?c :where [?c :community/name]]", db_since_schema)
+        results = Peer.q(@community_query, db_since_schema)
         puts results.size
         binding.pry
       end
@@ -389,7 +402,7 @@ describe "Seattle Sample", :jruby => true do
       it "demonstrates sample 23" do
         puts "\nFind all communities since seed data transaction..."
         db_since_data = @conn.db.since(@data_tx_date);
-        results = Peer.q("[:find ?c :where [?c :community/name]]", db_since_data)
+        results = Peer.q(@community_query, db_since_data)
         puts results.size
         binding.pry
       end
@@ -417,7 +430,7 @@ describe "Seattle Sample", :jruby => true do
 
       it "demonstrates sample 26" do
         puts "\nUpdate data for a community..."
-        results = Peer.q("[:find ?id :where [?id :community/name \"belltown\"]]",
+        results = Peer.q([:find, ~"?id", :where, [~"?id", :"community/name", "belltown"]],
                          @conn.db)
         belltown_id = results.first[0]
         update_category_tx = [{:"db/id" => belltown_id,
@@ -434,7 +447,7 @@ describe "Seattle Sample", :jruby => true do
         binding.pry
 
         puts "\nRetract a community entity..."
-        results = Peer.q("[:find ?id :where [?id :community/name \"Easton\"]]",
+        results = Peer.q([:find, ~"?id", :where, [~"?id", :"community/name", "Easton"]],
                          @conn.db)
         easton_id = results.first[0]
         retract_entity_tx = [{:"db.fn/retractEntity" => easton_id}]
@@ -463,11 +476,11 @@ end
         puts "\nPoll queue for transaction notification, print data that was added..."
         report = queue.poll
 binding.pry
-        results = Peer.q("[:find ?e ?aname ?v ?added " +
-                         ":in $ [[?e ?a ?v _ ?added]] " +
-                         ":where " +
-                         "[?e ?a ?v _ ?added]" +
-                         "[?a :db/ident ?aname]]",
+        results = Peer.q([:find, ~"?e", ~"?aname", ~"?v", ~"?added",
+                         :in, ~"\$", [[~"?e", ~"?a", ~"?v", _, ~"?added"]],
+                         :where,
+                         [~"?e", ~"?a", ~"?v", _, ~"?added"],
+                         [~"?a", :"db/ident", ~"?aname"]],
                          report.get(Java::Datomic::Connection::DB_AFTER),
                          report.get(Java::Datomic::Connection::TX_DATA))
         results.each do |result|
