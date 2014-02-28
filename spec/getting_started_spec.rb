@@ -295,9 +295,9 @@ describe "Seattle Sample", :jruby => true do
           "  [?n :neighborhood/district ?d]" +
           "  [?d :district/region ?re]" +
           "  [?re :db/ident ?r]]]"
-        results = Peer.q("[:find ?n :in $ % :where " +
-                         "[?c :community/name ?n]" +
-                         "(region ?c :region/ne)]",
+        results = Peer.q([:find, ~"?n", :in, ~"\$", ~"%", :where,
+                          [~"?c", :"community/name", ~"?n"],
+                          Utils.fn(~"region", ~"?c", :"region/ne")],
                          @conn.db,
                          rules)
         results.each do |result|
@@ -309,7 +309,7 @@ describe "Seattle Sample", :jruby => true do
                           :in, ~"\$", ~"%",
                           :where,
                           [~"?c", :"community/name", ~"?n"],
-                          :"(region ? :region/sw)"],
+                          Utils.fn(~"region", ~"?", :"region/sw")],
                          @conn.db,
                          rules)
         results.each do |result|
@@ -341,8 +341,8 @@ describe "Seattle Sample", :jruby => true do
                           :in, ~"\$",  ~"%",
                           :where,
                           [~"?c", :"community/name", ~"?n"],
-                          :"(southern ?c)",
-                          :"(social-media ?c)"],
+                          Utils.fn(~"southern", ~"?c"),
+                          Utils.fn(~"social-media", ~"?c")],
                          @conn.db,
                          rules)
         results.each do |result|
@@ -380,7 +380,7 @@ describe "Seattle Sample", :jruby => true do
 
         puts "\nFind all communities as of schema transaction..."
         db_asOf_schema = @conn.db.as_of(@schema_tx_date)
-        results = Peer.q(@community_query, db_asOf_schema)
+        results = Peer.q(@communities_query, db_asOf_schema)
         puts results.size
         binding.pry
       end
@@ -388,7 +388,7 @@ describe "Seattle Sample", :jruby => true do
       it "demonstrates sample 21" do
         puts "\nFind all communities as of seed data transaction..."
         db_asOf_data = @conn.db.as_of(@data_tx_date)
-        results = Peer.q(@community_query, db_asOf_data)
+        results = Peer.q(@communities_query, db_asOf_data)
         puts results.size
         binding.pry
       end
@@ -396,7 +396,7 @@ describe "Seattle Sample", :jruby => true do
       it "demonstrates sample 22" do
         puts "\nFind all communities since schema transaction..."
         db_since_schema = @conn.db.since(@schema_tx_date)
-        results = Peer.q(@community_query, db_since_schema)
+        results = Peer.q(@communities_query, db_since_schema)
         puts results.size
         binding.pry
       end
@@ -404,7 +404,7 @@ describe "Seattle Sample", :jruby => true do
       it "demonstrates sample 23" do
         puts "\nFind all communities since seed data transaction..."
         db_since_data = @conn.db.since(@data_tx_date);
-        results = Peer.q(@community_query, db_since_data)
+        results = Peer.q(@communities_query, db_since_data)
         puts results.size
         binding.pry
       end
