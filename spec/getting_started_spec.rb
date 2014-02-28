@@ -231,8 +231,8 @@ describe "Seattle Sample", :jruby => true do
         results = Peer.q([:find, ~"?n",
                           :where,
                          [~"?c", :"community/name", ~"?n"],
-                         [:'(.compareTo ?n "C")', ~"?res"],
-                         [:"(< ?res 0)"]],
+                         [Utils.fn(~".compareTo", ~"?n", "C"), ~"?res"],
+                         [Utils.fn(~"<", ~"?res", 0)]],
                          @conn.db)
         results.each do |result|
           puts result
@@ -244,7 +244,8 @@ describe "Seattle Sample", :jruby => true do
         puts '\nFind all communities whose names include the string "Wallingford"...'
         results = Peer.q([:find, ~"?n",
                           :where,
-                         [:'(fulltext $ :community/name "Wallingford")', [[~"?e", ~"?n"]]]],
+                         [Utils.fn(~"fulltext", ~"\$", :"community/name", "Wallingford"),
+                          [[~"?e", ~"?n"]]]],
                          @conn.db)
         results.each do |result|
           puts result
@@ -260,7 +261,8 @@ describe "Seattle Sample", :jruby => true do
                           :where,
                           [~"?c", :"community/name", ~"?name"],
                           [~"?c", :"community/type", ~"?type"],
-                          [:"(fulltext $ :community/category ?search)", [[~"?c", ~"?cat"]]]],
+                          [Utils.fn(~"fulltext", ~"\$", :"community/category", ~"?search"),
+                           [[~"?c", ~"?cat"]]]],
                          @conn.db,
                          :"community.type/website",
                          "food")
