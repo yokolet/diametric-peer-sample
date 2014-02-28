@@ -274,7 +274,8 @@ describe "Seattle Sample", :jruby => true do
 
       it "demonstrates sample 17" do
         puts "\nFind all names of all communities that are twitter feeds, using rules..."
-        rules = "[[[twitter ?c] [?c :community/type :community.type/twitter]]]"
+        rules = [[[~"twitter", ~"?c"],
+                  [~"?c", :"community/type", :"community.type/twitter"]]]
         results = Peer.q("[:find ?n :in $ % :where " +
                          "[?c :community/name ?n]" +
                          "(twitter ?c)]",
@@ -289,12 +290,11 @@ describe "Seattle Sample", :jruby => true do
       it "demonstrates sample 18" do
         puts "\nFind names of all communities in NE and SW regions, using rules " +
           "to avoid repeating logic..."
-        rules =
-          "[[[region ?c ?r]" +
-          "  [?c :community/neighborhood ?n]" +
-          "  [?n :neighborhood/district ?d]" +
-          "  [?d :district/region ?re]" +
-          "  [?re :db/ident ?r]]]"
+        rules = [[[~"region", ~"?c", ~"?r"],
+                  [~"?c", :"community/neighborhood", ~"?n"],
+                  [~"?n", :"neighborhood/district", ~"?d"],
+                  [~"?d", :"district/region", ~"?re"],
+                  [~"?re", :"db/ident", ~"?r"]]]
         results = Peer.q([:find, ~"?n", :in, ~"\$", ~"%", :where,
                           [~"?c", :"community/name", ~"?n"],
                           Utils.fn(~"region", ~"?c", :"region/ne")],
@@ -321,22 +321,21 @@ describe "Seattle Sample", :jruby => true do
       it "demonstrates sample 19" do
         puts "\nFind names of all communities that are in any of the southern " +
           "regions and are social-media, using rules for OR logic..."
-        rules =
-          "[[[region ?c ?r]" +
-          "  [?c :community/neighborhood ?n]" +
-          "  [?n :neighborhood/district ?d]" +
-          "  [?d :district/region ?re]" +
-          "  [?re :db/ident ?r]]" +
-          " [[social-media ?c]" +
-          "  [?c :community/type :community.type/twitter]]" +
-          " [[social-media ?c]" +
-          "  [?c :community/type :community.type/facebook-page]]" +
-          " [[northern ?c] (region ?c :region/ne)]" +
-          " [[northern ?c] (region ?c :region/n)]" +
-          " [[northern ?c] (region ?c :region/nw)]" +
-          " [[southern ?c] (region ?c :region/sw)]" +
-          " [[southern ?c] (region ?c :region/s)]" +
-          " [[southern ?c] (region ?c :region/se)]]"
+        rules = [[[~"region", ~"?c", ~"?r"],
+                  [~"?c", :"community/neighborhood", ~"?n"],
+                  [~"?n", :"neighborhood/district", ~"?d"],
+                  [~"?d", :"district/region", ~"?re"],
+                  [~"?re", :"db/ident", ~"?r"]],
+                 [[~"social-media", ~"?c"],
+                  [~"?c", :"community/type", :"community.type/twitter"]],
+                 [[~"social-media", ~"?c"],
+                  [~"?c", :"community/type", :"community.type/facebook-page"]],
+                 [[~"northern", ~"?c"], Utils.fn(~"region", ~"?c", :"region/ne")],
+                 [[~"northern", ~"?c"], Utils.fn(~"region", ~"?c", :"region/n")],
+                 [[~"northern", ~"?c"], Utils.fn(~"region", ~"?c", :"region/nw")],
+                 [[~"southern", ~"?c"], Utils.fn(~"region", ~"?c", :"region/sw")],
+                 [[~"southern", ~"?c"], Utils.fn(~"region", ~"?c", :"region/s")],
+                 [[~"southern", ~"?c"], Utils.fn(~"region", ~"?c", :"region/se")]]
         results = Peer.q([:find, ~"?n",
                           :in, ~"\$",  ~"%",
                           :where,
@@ -479,9 +478,9 @@ end
         report = queue.poll
 binding.pry
         results = Peer.q([:find, ~"?e", ~"?aname", ~"?v", ~"?added",
-                         :in, ~"\$", [[~"?e", ~"?a", ~"?v", _, ~"?added"]],
+                         :in, ~"\$", [[~"?e", ~"?a", ~"?v", ~"_", ~"?added"]],
                          :where,
-                         [~"?e", ~"?a", ~"?v", _, ~"?added"],
+                         [~"?e", ~"?a", ~"?v", ~"_", ~"?added"],
                          [~"?a", :"db/ident", ~"?aname"]],
                          report.get(Java::Datomic::Connection::DB_AFTER),
                          report.get(Java::Datomic::Connection::TX_DATA))
