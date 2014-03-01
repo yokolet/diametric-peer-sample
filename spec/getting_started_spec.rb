@@ -9,7 +9,7 @@ describe "Seattle Sample", :jruby => true do
     puts "\nCreating and connecting to database..."
     uri = "datomic:mem://seattle";
     @conn = Peer.connect(uri);
-    binding.pry
+    binding.pry unless ENV['DEBUG']
   end
 
   after(:all) do
@@ -22,12 +22,12 @@ describe "Seattle Sample", :jruby => true do
       schema_tx = Utils.read_all(File.join(File.dirname(__FILE__), "edn", "seattle-schema.edn"))
       tx_result = @conn.transact(schema_tx[0]).get
       puts tx_result
-      binding.pry
+      binding.pry unless ENV['DEBUG']
 
       puts "\nParsing seed data edn file and running transaction..."
       data_tx = Utils.read_all(File.join(File.dirname(__FILE__), "edn", "seattle-data0.edn"))
       tx_result = @conn.transact(data_tx[0]).get
-      binding.pry
+      binding.pry unless ENV['DEBUG']
     end
 
     describe "with common results" do
@@ -35,7 +35,7 @@ describe "Seattle Sample", :jruby => true do
         puts "\nFinding all communities, counting results..."
         @results = Peer.q([:find, ~"?c", :where, [~"?c", :"community/name"]], @conn.db)
         puts @results.size
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
       it "demonstrates sample 1" do
@@ -43,11 +43,11 @@ describe "Seattle Sample", :jruby => true do
         id = @results.first[0]
         entity = @conn.db.entity(id)
         puts entity.keys
-        binding.pry
+        binding.pry unless ENV['DEBUG']
 
         puts "\nDisplaying the value of the entity's community name..."
         puts entity[:"community/name"]
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
       it "demonstrates sample 2" do
@@ -58,7 +58,7 @@ describe "Seattle Sample", :jruby => true do
           entity = db.entity(result[0])
           puts entity[:"community/name"]
         end
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
       it "demonstrates sample 3" do
@@ -70,7 +70,7 @@ describe "Seattle Sample", :jruby => true do
           neighborhood = entity[:"community/neighborhood"]
           puts neighborhood[:"neighborhood/name"]
         end
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
       it "demonstrates sample 4" do
@@ -82,7 +82,7 @@ describe "Seattle Sample", :jruby => true do
         communities.each do |comm|
           puts comm[:"community/name"]
         end
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
     end
 
@@ -94,7 +94,7 @@ describe "Seattle Sample", :jruby => true do
         results.each do |result|
           puts result[1]
         end
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
       it "demonstrates sample 6" do
@@ -106,7 +106,7 @@ describe "Seattle Sample", :jruby => true do
         results.each do |result|
           puts result
         end
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
       it "demonstrates sample 7" do
@@ -119,7 +119,7 @@ describe "Seattle Sample", :jruby => true do
         results.each do |result|
           puts result
         end
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
       it "demonstrates sample 8" do
@@ -131,7 +131,7 @@ describe "Seattle Sample", :jruby => true do
         results.each do |result|
           puts result
         end
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
       it "demonstrates sample 9" do
@@ -146,7 +146,7 @@ describe "Seattle Sample", :jruby => true do
         results.each do |result|
           puts result
         end
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
       it "demonstrates sample 10" do
@@ -161,7 +161,7 @@ describe "Seattle Sample", :jruby => true do
         results.each do |result|
           puts result
         end
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
       it "demonstrates sample 11" do
@@ -179,7 +179,7 @@ describe "Seattle Sample", :jruby => true do
         results.each do |result|
           puts result
         end
-        binding.pry
+        binding.pry unless ENV['DEBUG']
 
         results = Peer.q(query_by_type,
                          @conn.db,
@@ -187,7 +187,7 @@ describe "Seattle Sample", :jruby => true do
         results.each do |result|
           puts result
         end
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
       it "demonstrates sample 12" do
@@ -203,7 +203,7 @@ describe "Seattle Sample", :jruby => true do
         results.each do |result|
           puts result
         end
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
       it "demonstrates sample 13" do
@@ -223,7 +223,7 @@ describe "Seattle Sample", :jruby => true do
         results.each do |result|
           puts result
         end
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
       it "demonstrates sample 14" do
@@ -237,7 +237,7 @@ describe "Seattle Sample", :jruby => true do
         results.each do |result|
           puts result
         end
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
       it "demonstrates sample 15" do
@@ -250,7 +250,7 @@ describe "Seattle Sample", :jruby => true do
         results.each do |result|
           puts result
         end
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
       it "demonstrates sample 16" do
@@ -269,7 +269,7 @@ describe "Seattle Sample", :jruby => true do
         results.each do |result|
           puts result
         end
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
       it "demonstrates sample 17" do
@@ -284,7 +284,7 @@ describe "Seattle Sample", :jruby => true do
         results.each do |result|
           puts result
         end
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
       it "demonstrates sample 18" do
@@ -303,7 +303,7 @@ describe "Seattle Sample", :jruby => true do
         results.each do |result|
           puts result
         end
-        binding.pry
+        binding.pry unless ENV['DEBUG']
 
         results = Peer.q([:find, ~"?n",
                           :in, ~"\$", ~"%",
@@ -315,7 +315,7 @@ describe "Seattle Sample", :jruby => true do
         results.each do |result|
           puts result
         end
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
       it "demonstrates sample 19" do
@@ -347,7 +347,7 @@ describe "Seattle Sample", :jruby => true do
         results.each do |result|
           puts result
         end
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
     end
 
@@ -356,7 +356,7 @@ describe "Seattle Sample", :jruby => true do
         puts "\nFind all database transactions..."
         results = Peer.q([:find, ~"?when", :where, [~"?tx", :"db/txInstant", ~"?when"]],
                          @conn.db)
-        binding.pry
+        binding.pry unless ENV['DEBUG']
 
         puts "\nSort transactions by time they occurred, then " +
           "pull out date when seed data load transaction and " +
@@ -370,7 +370,7 @@ describe "Seattle Sample", :jruby => true do
         @data_tx_date = tx_dates[0]
         @schema_tx_date = tx_dates[1]
         @communities_query = [:find, ~"?c", :where, [~"?c", :"community/name"]]
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
       it "demonstrates sample 20" do
@@ -381,7 +381,7 @@ describe "Seattle Sample", :jruby => true do
         db_asOf_schema = @conn.db.as_of(@schema_tx_date)
         results = Peer.q(@communities_query, db_asOf_schema)
         puts results.size
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
       it "demonstrates sample 21" do
@@ -389,7 +389,7 @@ describe "Seattle Sample", :jruby => true do
         db_asOf_data = @conn.db.as_of(@data_tx_date)
         results = Peer.q(@communities_query, db_asOf_data)
         puts results.size
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
       it "demonstrates sample 22" do
@@ -397,7 +397,7 @@ describe "Seattle Sample", :jruby => true do
         db_since_schema = @conn.db.since(@schema_tx_date)
         results = Peer.q(@communities_query, db_since_schema)
         puts results.size
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
       it "demonstrates sample 23" do
@@ -405,7 +405,7 @@ describe "Seattle Sample", :jruby => true do
         db_since_data = @conn.db.since(@data_tx_date);
         results = Peer.q(@communities_query, db_since_data)
         puts results.size
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
     end
 
@@ -417,7 +417,7 @@ describe "Seattle Sample", :jruby => true do
                           :"db.install/_partition" => :"db.part/db"}]
         txResult = @conn.transact(partition_tx).get
         puts txResult
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
       it "demonstrates sample 25" do
@@ -426,7 +426,7 @@ describe "Seattle Sample", :jruby => true do
                               :"community/name" => "Easton"}]
         txResult = @conn.transact(add_community_tx).get
         puts txResult
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
       it "demonstrates sample 26" do
@@ -438,14 +438,14 @@ describe "Seattle Sample", :jruby => true do
                                 :"community/category" => "free stuff"}]
         txResult = @conn.transact(update_category_tx).get
         puts txResult
-        binding.pry
+        binding.pry unless ENV['DEBUG']
         
         puts "\nRetract data for a community..."
         retract_category_tx = [[:"db/retract", belltown_id,
                                 :"community/category", "free stuff"]]
         txResult = @conn.transact(retract_category_tx).get
         puts txResult
-        binding.pry
+        binding.pry unless ENV['DEBUG']
 
         puts "\nRetract a community entity..."
         results = Peer.q([:find, ~"?id", :where, [~"?id", :"community/name", "Easton"]],
@@ -454,7 +454,7 @@ describe "Seattle Sample", :jruby => true do
         retract_entity_tx = [{:"db.fn/retractEntity" => easton_id}]
         txResult = @conn.transact(retract_category_tx).get
         puts txResult
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
 
 =begin
@@ -472,22 +472,21 @@ end
                               :"community/name" => "Easton"}]
         txResult = @conn.transact(add_community_tx).get
         puts txResult
-        binding.pry
+        binding.pry unless ENV['DEBUG']
 
         puts "\nPoll queue for transaction notification, print data that was added..."
         report = queue.poll
-binding.pry
         results = Peer.q([:find, ~"?e", ~"?aname", ~"?v", ~"?added",
                          :in, ~"\$", [[~"?e", ~"?a", ~"?v", ~"_", ~"?added"]],
                          :where,
                          [~"?e", ~"?a", ~"?v", ~"_", ~"?added"],
                          [~"?a", :"db/ident", ~"?aname"]],
-                         report.get(Java::Datomic::Connection::DB_AFTER),
-                         report.get(Java::Datomic::Connection::TX_DATA))
+                         report[Java::Datomic::Connection::DB_AFTER],
+                         report[Java::Datomic::Connection::TX_DATA])
         results.each do |result|
           puts result
         end
-        binding.pry
+        binding.pry unless ENV['DEBUG']
       end
     end
   end
