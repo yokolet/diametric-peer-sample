@@ -1,5 +1,6 @@
-PATH
-  remote: /Users/yoko/Projects/diametric
+GIT
+  remote: git@github.com:relevance/diametric.git
+  revision: 82e883bdfe94cc691083af791a9277bd3d561588
   specs:
     diametric (0.1.3-java)
       activemodel (~> 3.2, >= 3.2.16)
@@ -47,6 +48,10 @@ GEM
     naether (0.10.1-java)
     parslet (1.4.0)
       blankslate (~> 2.0)
+    pry (0.9.12.6)
+      coderay (~> 1.0)
+      method_source (~> 0.8)
+      slop (~> 3.4)
     pry (0.9.12.6-java)
       coderay (~> 1.0)
       method_source (~> 0.8)
@@ -61,10 +66,10 @@ GEM
       rspec-core (~> 2.14.0)
       rspec-expectations (~> 2.14.0)
       rspec-mocks (~> 2.14.0)
-    rspec-core (2.14.7)
+    rspec-core (2.14.8)
     rspec-expectations (2.14.5)
       diff-lcs (>= 1.1.3, < 2.0)
-    rspec-mocks (2.14.5)
+    rspec-mocks (2.14.6)
     rubyzip (0.9.9)
     slop (3.4.7)
     spoon (0.0.4)
